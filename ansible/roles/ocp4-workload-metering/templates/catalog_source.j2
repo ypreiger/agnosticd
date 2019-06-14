@@ -1,8 +1,9 @@
-apiVersion: operators.coreos.com/v1
-kind: CatalogSourceConfig
+# just for remove_workload.yaml, not needed for workload.yaml 
+# because workload.yaml creates CatalogSourceConfig
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
 metadata:
  name: metering-operators
  namespace: openshift-marketplace
-spec:
-  targetNamespace: {{ _metering_namespace }}
-  packages: metering
+spec: {}

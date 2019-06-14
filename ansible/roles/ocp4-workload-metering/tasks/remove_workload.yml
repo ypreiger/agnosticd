@@ -16,6 +16,7 @@
   loop:
   - ./templates/subscription.j2
   - ./templates/catalog_source_config.j2
+  - ./templates/catalog_source.j2
   - ./templates/operator_group.j2
 
 - name: Remove Metering Namespace
