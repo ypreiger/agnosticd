@@ -1,10 +1,12 @@
 ---
 become_override: false
-ocp_username: shachar-redhat.com
+silent: false
+
+ocp_username: wkulhane-redhat.com
 ocp_user_needs_quota: True
 
 ocp_user_groups:
-  - OPENTLC-PROJECT-PROVISIONERS
+- OPENTLC-PROJECT-PROVISIONERS
 
 gpte_jenkins_project: gpte-jenkins
 
@@ -20,4 +22,3 @@ quota_persistentvolumeclaims: 15
 quota_services: 150
 quota_secrets: 150
 quota_requests_storage: 50Gi
-silent: false
