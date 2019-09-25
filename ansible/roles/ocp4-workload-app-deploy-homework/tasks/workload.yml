@@ -1,8 +1,8 @@
 ---
 - name: Add user to developer group (allowed to create projects)
-  command: "oc adm groups add-users {{item}} {{ocp_username}}"
+  command: "oc adm groups add-users {{ item }} {{ ocp_username }}"
   register: groupadd_register
-  with_items: "{{ocp_user_groups}}"
+  loop: "{{ ocp_user_groups }}"
   when:
     - ocp_username is defined
     - ocp_user_groups | default([]) | length > 0
@@ -12,26 +12,36 @@
     var: groupadd_register
     verbosity: 2
 
-- name: Create user Quota - ClusterResourceQuota
-  ignore_errors: true
-  command: |
-    oc create clusterresourcequota clusterquota-"{{ocp_username}}-{{guid}}" \
-    --project-annotation-selector=openshift.io/requester="{{ocp_username}}" \
-    --hard requests.cpu="{{quota_requests_cpu}}" \
-    --hard limits.cpu="{{quota_limits_cpu}}"  \
-    --hard requests.memory="{{quota_requests_memory}}" \
-    --hard limits.memory="{{quota_limits_memory}}" \
-    --hard configmaps="{{quota_configmaps}}" \
-    --hard pods="{{quota_pods}}" \
-    --hard persistentvolumeclaims="{{quota_persistentvolumeclaims}}"  \
-    --hard services="{{quota_services}}" \
-    --hard secrets="{{quota_secrets}}" \
-    --hard requests.storage="{{quota_requests_storage}}"
+- name: Create ClusterResourceQuota for user {{ ocp_username }}
+  k8s:
+    username: system:admin
+    state: present
+    definition:
+      apiVersion: quota.openshift.io/v1
+      kind: ClusterResourceQuota
+      metadata:
+        name: "clusterquota-{{ ocp_username }}-{{ guid }}"
+      spec:
+        quota:
+          hard:
+            configmaps: "{{quota_configmaps}}"
+            limits.cpu: "{{quota_limits_cpu}}"
+            limits.memory: "{{quota_limits_memory}}"
+            persistentvolumeclaims: "{{quota_persistentvolumeclaims}}"
+            pods: "{{quota_pods}}"
+            requests.cpu: "{{quota_limits_cpu}}"
+            requests.memory: "{{quota_requests_memory}}"
+            requests.storage: "{{quota_requests_storage}}"
+            secrets: "{{quota_secrets}}"
+            services: "{{quota_services}}"
+        selector:
+          annotations:
+            openshift.io/requester: "{{ ocp_username }}"
 
 - name: Allow user view access to gpte-jenkins project
   ignore_errors: true
   command: |
-    oc policy add-role-to-user view {{ocp_username}} -n {{gpte_jenkins_project}}
+    oc policy add-role-to-user view {{ ocp_username }} -n {{ gpte_jenkins_project }}
 
 # Leave this as the last task in the playbook.
 - name: workload tasks complete
