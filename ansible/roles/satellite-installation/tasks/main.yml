@@ -1,3 +1,0 @@
----
-- import_tasks: satellite_installation.yml
-- import_tasks: firewalld.yml
